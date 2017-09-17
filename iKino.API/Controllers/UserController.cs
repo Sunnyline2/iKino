@@ -48,9 +48,6 @@ namespace iKino.API.Controllers
                 return BadRequest(ModelState);
 
             var user = await _userService.LoginAsync(authenticate.Username, authenticate.Password);
-            if (user == null)
-                return NotFound();
-
             var expiry = DateTime.Now.AddDays(1);
             var token = _jwtService.GenerateToken(user.UserId.ToString(), user.Username, user.Role, expiry);
             return Ok(AuthToken.Create(new JwtSecurityTokenHandler().WriteToken(token), expiry));

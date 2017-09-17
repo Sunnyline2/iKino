@@ -2,6 +2,7 @@
 using iKino.API.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,10 +17,16 @@ namespace iKino.API.Repositories
             _database = database;
         }
 
-        public async Task<IQueryable<User>> GetAsync()
+        public async Task<List<User>> GetAsync()
+        {
+            return await _database.Context.Users.ToListAsync();
+        }
+
+        public async Task<IQueryable<User>> AsQueryable()
         {
             return _database.Context.Users.AsQueryable();
         }
+
 
         public async Task<User> GetByIdAsync(Guid id)
         {

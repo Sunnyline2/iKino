@@ -6,6 +6,7 @@ using iKino.API.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace iKino.API.Services
@@ -14,28 +15,31 @@ namespace iKino.API.Services
     {
         private readonly IRepository<User> _userRepository;
         private readonly IHashService _hashService;
+        private readonly IMapper _mapper;
 
-        public UserService(IRepository<User> userRepository, IHashService hashService)
+        public UserService(IRepository<User> userRepository, IHashService hashService, IMapper mapper)
         {
             _userRepository = userRepository;
             _hashService = hashService;
+            _mapper = mapper;
         }
+
 
         public async Task<IEnumerable<UserDto>> BrowseAsync()
         {
             var users = await _userRepository.GetAsync();
-            return Mapper.Map<IEnumerable<UserDto>>(users);
+            return _mapper.Map<IEnumerable<UserDto>>(users);
         }
 
         public async Task<UserDto> GetByIdAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
-            return Mapper.Map<UserDto>(user);
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<UserDto> LoginAsync(string username, string password)
         {
-            var users = await _userRepository.GetAsync();
+            var users = await _userRepository.AsQueryable();
             var user = await users.SingleOrDefaultAsync(x => x.Username == username);
 
             if (user == null)
@@ -45,25 +49,21 @@ namespace iKino.API.Services
             if (!string.Equals(hash, user.Password))
                 throw new ServiceException("The entered password is incorrect.");
 
-            return Mapper.Map<UserDto>(user);
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<UserDto> RegisterAsync(string username, string password, string mail)
         {
             var users = await _userRepository.GetAsync();
 
-            if (await users.AnyAsync(x => x.Username == username) || await users.AnyAsync(x => x.Mail == mail))
-            {
+            if (users.Any(x => x.Username == username) || users.Any(x => x.Mail == mail))
                 throw new ServiceException("The email address or username is already used.");
-            }
-
-
 
             var user = new User(username, mail);
             user.SetPassword(password, _hashService);
 
             await _userRepository.InsertAsync(user);
-            return Mapper.Map<UserDto>(user);
+            return _mapper.Map<UserDto>(user);
         }
     }
 }

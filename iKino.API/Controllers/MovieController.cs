@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using iKino.API.Attribute;
-using iKino.API.Domain;
 using iKino.API.Dto;
 using iKino.API.Models;
-using iKino.API.Repositories.Interfaces;
 using iKino.API.Requests;
+using iKino.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -15,17 +14,18 @@ namespace iKino.API.Controllers
     [Route("api/[Controller]")]
     public class MovieController : Controller
     {
-        private readonly IRepository<Movie> _movieRepository;
+        private readonly IMovieService _movieService;
 
-        public MovieController(IRepository<Movie> movieRepository)
+
+        public MovieController(IMovieService movieService)
         {
-            _movieRepository = movieRepository;
+            _movieService = movieService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetMovies()
         {
-            var movies = await _movieRepository.GetAsync();
+            var movies = await _movieService.BrowseAsync();
             return Ok(movies.ToArray());
         }
 
@@ -33,9 +33,8 @@ namespace iKino.API.Controllers
         [Route("{page}/{size}")]
         public async Task<IActionResult> GetMovies(int page, int size)
         {
-            var movies = await _movieRepository.GetAsync();
-
-            return Ok(Pagination.Create(movies.Skip(page).Take(size), page, size));
+            var movies = await _movieService.BrowseAsync(page, size);
+            return Ok(Pagination.Create(movies, page, size));
         }
 
 
@@ -43,7 +42,7 @@ namespace iKino.API.Controllers
         [Route("{movieId}", Name = "GetMovie")]
         public async Task<IActionResult> GetMovie(Guid movieId)
         {
-            var movie = await _movieRepository.GetByIdAsync(movieId);
+            var movie = await _movieService.GetByIdAsync(movieId);
             return Ok(Mapper.Map<MovieDto>(movie));
         }
 
@@ -53,17 +52,9 @@ namespace iKino.API.Controllers
         public async Task<IActionResult> CreateMovie([FromBody]CreateMovie createMovie)
         {
             if (!ModelState.IsValid)
-                return Json(ModelState);
+                return BadRequest(ModelState);
 
-            //if (await _movieRepository.AnyAsync(x => string.Equals(x.Name.Trim().ToLowerInvariant(), createMovie.Name.Trim().ToLowerInvariant())))
-            //    return BadRequest("This movie already exists.");
-
-
-
-
-
-            var movie = new Movie(createMovie.Name, createMovie.Description, createMovie.Duration);
-            await _movieRepository.InsertAsync(movie);
+            var movie = await _movieService.CreateMovieAsync(createMovie.Name, createMovie.Description, createMovie.Duration);
             return CreatedAtRoute("GetMovie", new { movieId = movie.MovieId }, movie);
         }
 
@@ -73,18 +64,8 @@ namespace iKino.API.Controllers
         [RequireRole(Roles.Admin)]
         public async Task<IActionResult> DeleteMovie(Guid movieId)
         {
-            var movie = await _movieRepository.GetByIdAsync(movieId);
-            if (movie == null)
-                return NotFound();
-
-            await _movieRepository.DeleteAsync(movie.MovieId);
-            return Ok();
-        }
-
-        [HttpPut]
-        public async Task<IActionResult> UpdateMovie()
-        {
-            return Ok();
+            await _movieService.DeleteMovieAsync(movieId);
+            return NoContent();
         }
     }
 }

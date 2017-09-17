@@ -35,14 +35,12 @@ namespace iKino.API
             services.AddScoped<IRepository<User>, UserRepository>();
             services.AddScoped<IRepository<Movie>, MovieRepository>();
 
-
             services.AddScoped<IHashService, HashService>();
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IUserService, UserService>();
-
+            services.AddScoped<IMovieService, MovieService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(ConfigureToken);
-
         }
 
         private void ConfigureDatabase(IServiceProvider serviceProvider, DbContextOptionsBuilder dbContextOptionsBuilder)

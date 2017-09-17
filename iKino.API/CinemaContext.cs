@@ -24,6 +24,8 @@ namespace iKino.API
                 .WithMany(x => x.MovieActors)
                 .HasForeignKey(x => x.MovieId);
 
+            //TODO wireup models
+
         }
 
 

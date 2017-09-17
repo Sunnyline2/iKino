@@ -31,18 +31,31 @@ namespace iKino.API.Services
             return Mapper.Map<IEnumerable<MovieDto>>(movies.Skip(page).Take(size));
         }
 
+        public async Task<MovieDto> GetByIdAsync(Guid movieId)
+        {
+            var movie = await _movieRepository.GetByIdAsync(movieId);
+            return Mapper.Map<MovieDto>(movie);
+        }
+
         public async Task<MovieDto> CreateMovieAsync(string name, string description, TimeSpan duration)
         {
-            var movies = await _movieRepository.GetAsync();
+            var movies = await _movieRepository.AsQueryable();
 
             if (await movies.AnyAsync(x => string.Equals(x.Name.Trim(), name.Trim(), StringComparison.InvariantCultureIgnoreCase)))
-            {
                 throw new ServiceException("The title given is already added.");
-            }
 
             var movie = new Movie(name, description, duration);
             await _movieRepository.InsertAsync(movie);
             return Mapper.Map<MovieDto>(movie);
+        }
+
+        public async Task DeleteMovieAsync(Guid movieId)
+        {
+            var movie = await _movieRepository.GetByIdAsync(movieId);
+            if (movie == null)
+                throw new ServiceException("This movie does not exist.");
+
+            await _movieRepository.DeleteAsync(movieId);
         }
     }
 
@@ -50,7 +63,8 @@ namespace iKino.API.Services
     {
         Task<IEnumerable<MovieDto>> BrowseAsync();
         Task<IEnumerable<MovieDto>> BrowseAsync(int page, int size);
-
-
+        Task<MovieDto> GetByIdAsync(Guid movieId);
+        Task<MovieDto> CreateMovieAsync(string name, string description, TimeSpan duration);
+        Task DeleteMovieAsync(Guid movieId);
     }
 }

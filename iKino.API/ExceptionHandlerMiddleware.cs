@@ -40,7 +40,7 @@ namespace iKino.API
             {
                 return Handlers.HandleExceptionAsync(context, (ServiceException)exception);
             }
-            throw new NotImplementedException();
+            throw new Exception(string.Empty, exception);
         }
 
         public static class Handlers
