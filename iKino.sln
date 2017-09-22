@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "iKino.Tests.EndToEnd", "iKi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7ED91B1D-3BB1-4651-82DC-8392B58EB044}"
 	ProjectSection(SolutionItems) = preProject
+		iKino.API\.gitignore = iKino.API\.gitignore
 		appsettings.json = appsettings.json
 	EndProjectSection
 EndProject
