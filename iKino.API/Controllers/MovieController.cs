@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using iKino.API.DTO;
+using iKino.API.Services.Interfaces;
 
 namespace iKino.API.Controllers
 {

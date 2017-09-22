@@ -23,16 +23,12 @@ namespace iKino.API
                 .HasOne(x => x.Movie)
                 .WithMany(x => x.MovieActors)
                 .HasForeignKey(x => x.MovieId);
-
-            //TODO wireup models
-
         }
 
 
         public DbSet<User> Users { get; protected set; }
         public DbSet<Movie> Movies { get; protected set; }
         public DbSet<Actor> Actors { get; protected set; }
-        public DbSet<Vote> Votes { get; protected set; }
     }
 
 }

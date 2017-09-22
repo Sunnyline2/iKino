@@ -16,13 +16,12 @@ namespace iKino.API.Domain
         public string Description { get; protected set; }
         public TimeSpan Duration { get; protected set; }
         public virtual ICollection<MovieActor> MovieActors { get; protected set; }
-        public virtual ICollection<Vote> VoteMovies { get; protected set; }
 
         public Movie(string name, string description, TimeSpan duration)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name can not be empty.", nameof(name));
-
+        
             if (string.IsNullOrWhiteSpace(description))
                 throw new ArgumentException("Description can not be empty.", nameof(description));
 

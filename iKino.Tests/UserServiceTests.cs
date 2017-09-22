@@ -21,7 +21,7 @@ namespace iKino.Tests
             var mapper = new Mock<IMapper>();
             var userService = new UserService(repository.Object, hashService.Object, mapper.Object);
 
-            repository.Setup(x => x.AnyAsync(It.IsAny<Expression<Func<User, bool>>>())).ReturnsAsync(false); // czy u¿ytkownik istnieje
+            repository.Setup(x => x.AnyAsync(It.IsAny<Expression<Func<User, bool>>>())).ReturnsAsync(false);
             hashService.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
 
 
@@ -39,16 +39,28 @@ namespace iKino.Tests
             var mapperMock = new Mock<IMapper>();
             var userService = new UserService(repository.Object, hashMock.Object, mapperMock.Object);
 
-            repository.Setup(x => x.AnyAsync(It.IsAny<Expression<Func<User, bool>>>())).ReturnsAsync(true); // czy u¿ytkownik istnieje
-            hashMock.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
+            repository.Setup(x => x.AnyAsync(It.IsAny<Expression<Func<User, bool>>>())).ReturnsAsync(true);
 
-            await Assert.ThrowsAsync<ServiceException>(async () => await userService.RegisterAsync("username", "password", "mail"));
+            hashMock.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
+            await Assert.ThrowsAsync<ServiceException>(async () => await userService.RegisterAsync("username", "password", "user@gmail.com"));
             repository.Verify(x => x.AnyAsync(It.IsAny<Expression<Func<User, bool>>>()), Times.Once);
         }
 
         [Fact]
-        public async Task login()
-        { }
+        public async Task login_asnyc_should_login_user()
+        {
+            var repository = new Mock<IUserRepository>();
+            var hashMock = new Mock<IHashService>();
+            var mapperMock = new Mock<IMapper>();
+            var userService = new UserService(repository.Object, hashMock.Object, mapperMock.Object);
+            hashMock.Setup(x => x.Hash(It.IsAny<string>())).Returns("hash");
 
+            var user = new User("username", "user@gmail.com");
+            user.SetPassword("password", hashMock.Object);
+
+            repository.Setup(x => x.GetUserByNameAsync(user.Username)).ReturnsAsync(user);
+            await userService.LoginAsync(user.Username, user.Password);
+            repository.Verify(x => x.GetUserByNameAsync(user.Username), Times.Once);
+        }
     }
 }

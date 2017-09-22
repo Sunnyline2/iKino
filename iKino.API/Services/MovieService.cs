@@ -5,6 +5,7 @@ using iKino.API.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using iKino.API.Services.Interfaces;
 
 namespace iKino.API.Services
 {
@@ -54,14 +55,5 @@ namespace iKino.API.Services
 
             await _movieRepository.RemoveAsync(movie);
         }
-    }
-
-    public interface IMovieService
-    {
-        Task<IEnumerable<MovieDto>> BrowseAsync();
-        Task<IEnumerable<MovieDto>> BrowseAsync(int page, int size);
-        Task<MovieDto> GetByIdAsync(Guid movieId);
-        Task<MovieDto> CreateMovieAsync(string name, string description, TimeSpan duration);
-        Task DeleteMovieAsync(Guid movieId);
     }
 }
