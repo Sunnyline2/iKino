@@ -29,10 +29,10 @@ namespace iKino.API
         }
 
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Movie> Movies { get; set; }
-        public DbSet<Actor> Actors { get; set; }
-        public DbSet<Vote> Votes { get; set; }
+        public DbSet<User> Users { get; protected set; }
+        public DbSet<Movie> Movies { get; protected set; }
+        public DbSet<Actor> Actors { get; protected set; }
+        public DbSet<Vote> Votes { get; protected set; }
     }
 
 }

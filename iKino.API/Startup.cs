@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using iKino.API.Domain;
-using iKino.API.Dto;
+using iKino.API.DTO;
 using iKino.API.Repositories;
 using iKino.API.Repositories.Interfaces;
 using iKino.API.Services;
@@ -32,8 +32,8 @@ namespace iKino.API
 
             services.AddDbContext<CinemaContext>(ConfigureDatabase);
             services.AddScoped<IDatabase<CinemaContext>, Database>();
-            services.AddScoped<IRepository<User>, UserRepository>();
-            services.AddScoped<IRepository<Movie>, MovieRepository>();
+            services.AddScoped<IMovieRepository, MovieRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddScoped<IHashService, HashService>();
             services.AddScoped<IJwtService, JwtService>();

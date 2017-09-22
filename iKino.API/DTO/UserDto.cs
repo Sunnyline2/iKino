@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace iKino.API.Dto
+namespace iKino.API.DTO
 {
     public class UserDto
     {

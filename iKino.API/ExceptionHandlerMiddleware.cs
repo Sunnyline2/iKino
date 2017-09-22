@@ -40,7 +40,7 @@ namespace iKino.API
             {
                 return Handlers.HandleExceptionAsync(context, (ServiceException)exception);
             }
-            throw new Exception(string.Empty, exception);
+            throw new NotSupportedException("The exception is not supported.", exception);
         }
 
         public static class Handlers

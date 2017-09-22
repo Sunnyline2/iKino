@@ -4,11 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace iKino.API.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : IUserRepository
     {
         private readonly IDatabase<CinemaContext> _database;
 
@@ -17,45 +18,65 @@ namespace iKino.API.Repositories
             _database = database;
         }
 
-        public async Task<List<User>> GetAsync()
+        public DbSet<User> Users => _database.Context.Users;
+
+        public async Task<ICollection<User>> GetUsersAsync()
         {
-            return await _database.Context.Users.ToListAsync();
+            return await Users.ToListAsync();
         }
 
-        public async Task<IQueryable<User>> AsQueryable()
+        public async Task<ICollection<User>> GetUsersAsync(int page, int size)
         {
-            return _database.Context.Users.AsQueryable();
+            return await Users.Skip(page * size).Take(size).ToListAsync();
         }
 
-
-        public async Task<User> GetByIdAsync(Guid id)
+        public Task<ICollection<User>> SearchAsync(string value)
         {
-            return await _database.Context.Users.SingleOrDefaultAsync(x => x.UserId == id);
-
+            throw new NotImplementedException();
         }
 
-        public async Task InsertAsync(User value)
+        public async Task<User> GetUserByIdAsync(Guid userId)
         {
-            await _database.Context.Users.AddAsync(value);
+            return await Users.SingleOrDefaultAsync(x => x.UserId == userId);
+        }
+
+        public async Task<User> GetUserByNameAsync(string name)
+        {
+            return await Users.SingleOrDefaultAsync(x => x.Username == name);
+        }
+
+        public async Task<User> GetUserByMailAsync(string mail)
+        {
+            return await Users.SingleOrDefaultAsync(x => x.Mail == mail);
+        }
+
+        public async Task CreateAsync(User movie)
+        {
+            Users.Add(movie);
             await _database.Context.SaveChangesAsync();
-
         }
 
-        public async Task UpdateAsync(User value)
+        public async Task UpdateAsync(User movie)
         {
-            _database.Context.Users.Update(value);
+            Users.Update(movie);
             await _database.Context.SaveChangesAsync();
-
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task RemoveAsync(User movie)
         {
-            var user = await GetByIdAsync(id);
-            _database.Context.Users.Remove(user);
+            Users.Remove(movie);
             await _database.Context.SaveChangesAsync();
-
         }
 
-        public int Count => _database.Context.Users.Count();
+        public async Task<bool> AnyAsync(Expression<Func<User, bool>> expression)
+        {
+            return await Users.AnyAsync(expression);
+        }
+
+
+        public async Task<int> Count()
+        {
+            return await Users.CountAsync();
+        }
     }
 }

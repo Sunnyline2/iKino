@@ -1,4 +1,5 @@
 ﻿using System;
+using iKino.API.Repositories.Interfaces;
 
 namespace iKino.API.Repositories
 {

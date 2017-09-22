@@ -4,56 +4,69 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace iKino.API.Repositories
 {
-    public class MovieRepository : IRepository<Movie>
+    public class MovieRepository : IMovieRepository
     {
         private readonly IDatabase<CinemaContext> _database;
+
+        public DbSet<Movie> Movies => _database.Context.Movies;
 
         public MovieRepository(IDatabase<CinemaContext> database)
         {
             _database = database;
         }
 
-
-        public async Task<List<Movie>> GetAsync()
+        public async Task<ICollection<Movie>> GetMoviesAsync()
         {
-            return await _database.Context.Movies.ToListAsync();
+            return await Movies.ToListAsync();
         }
 
-        public async Task<IQueryable<Movie>> AsQueryable()
+        public async Task<ICollection<Movie>> GetMoviesAsync(int page, int size)
         {
-            return _database.Context.Movies.AsQueryable();
+            return await Movies.Skip(page * size).Take(size).ToListAsync();
+        }
+
+        public async Task<ICollection<Movie>> SearchAsync(string value)
+        {
+            return await Movies.Where(x => x.Name.ToLowerInvariant().Contains(value.ToLowerInvariant())).ToListAsync();
+        }
+
+        public async Task<Movie> GetMovieByIdAsync(Guid movieId)
+        {
+            return await Movies.SingleOrDefaultAsync(x => x.MovieId == movieId);
         }
 
 
-        public async Task<Movie> GetByIdAsync(Guid id)
+        public async Task CreateAsync(Movie movie)
         {
-            return await _database.Context.Movies.SingleOrDefaultAsync(x => x.MovieId == id);
-        }
-
-        public async Task InsertAsync(Movie value)
-        {
-            await _database.Context.Movies.AddAsync(value);
+            await Movies.AddAsync(movie);
             await _database.Context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Movie value)
+        public async Task UpdateAsync(Movie movie)
         {
-            _database.Context.Movies.Update(value);
-            await _database.Context.SaveChangesAsync();
-
-        }
-
-        public async Task DeleteAsync(Guid id)
-        {
-            var movie = await GetByIdAsync(id);
-            _database.Context.Movies.Remove(movie);
+            Movies.Update(movie);
             await _database.Context.SaveChangesAsync();
         }
 
-        public int Count => _database.Context.Users.Count();
+        public async Task RemoveAsync(Movie movie)
+        {
+            Movies.Remove(movie);
+            await _database.Context.SaveChangesAsync();
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<Movie, bool>> expression)
+        {
+            return await Movies.AnyAsync(expression);
+        }
+
+        public async Task<int> Count()
+        {
+            return await Movies.CountAsync();
+        }
     }
 }

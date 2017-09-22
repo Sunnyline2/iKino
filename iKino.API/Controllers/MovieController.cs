@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using iKino.API.Attribute;
-using iKino.API.Dto;
 using iKino.API.Models;
 using iKino.API.Requests;
 using iKino.API.Services;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using iKino.API.DTO;
 
 namespace iKino.API.Controllers
 {

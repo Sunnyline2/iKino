@@ -1,13 +1,11 @@
 ﻿using iKino.API.Attribute;
-using iKino.API.Domain;
+using iKino.API.Models;
 using iKino.API.Requests;
 using iKino.API.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
-using iKino.API.Models;
-using iKino.API.Services;
 
 namespace iKino.API.Controllers
 {
